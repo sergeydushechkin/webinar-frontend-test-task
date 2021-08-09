@@ -47,8 +47,13 @@ export const TodoItemsContextProvider = ({
         }
     }, []);
 
+
     useEffect(() => {
-        localStorage.setItem(localStorageKey, JSON.stringify(state));
+        try {
+            localStorage.setItem(localStorageKey, JSON.stringify(state))
+        } catch (e) {
+            alert(e.message);
+        };
     }, [state]);
 
     return (
