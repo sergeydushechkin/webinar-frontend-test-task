@@ -49,6 +49,7 @@ export const TodoItemsContextProvider = ({
         }
     }, []);
 
+
     useEffect(() => {
         const getStorageUpdate = () => {
             const storageState = window.localStorage.getItem(localStorageKey);
@@ -65,7 +66,11 @@ export const TodoItemsContextProvider = ({
     }, [])
 
     useEffect(() => {
-        localStorage.setItem(localStorageKey, JSON.stringify(state));
+        try {
+            localStorage.setItem(localStorageKey, JSON.stringify(state))
+        } catch (e) {
+            alert(e.message);
+        };
     }, [state]);
 
     return (
