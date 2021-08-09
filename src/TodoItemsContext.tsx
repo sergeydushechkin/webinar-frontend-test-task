@@ -48,6 +48,21 @@ export const TodoItemsContextProvider = ({
     }, []);
 
     useEffect(() => {
+        const getStorageUpdate = () => {
+            const storageState = window.localStorage.getItem(localStorageKey);
+            if (storageState) {
+                dispatch({ type: 'loadState', data: JSON.parse(storageState) });
+            }
+        }
+
+        window.addEventListener('storage', getStorageUpdate);
+
+        return () => {
+            window.removeEventListener('storage', getStorageUpdate);
+        }
+    }, [])
+
+    useEffect(() => {
         localStorage.setItem(localStorageKey, JSON.stringify(state));
     }, [state]);
 
