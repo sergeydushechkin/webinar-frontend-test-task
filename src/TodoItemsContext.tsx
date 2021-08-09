@@ -6,6 +6,8 @@ import {
     useReducer,
 } from 'react';
 
+import produce from "immer";
+
 export interface TodoItem {
     id: string;
     title: string;
@@ -76,34 +78,24 @@ function todoItemsReducer(state: TodoItemsState, action: TodoItemsAction) {
             return action.data;
         }
         case 'add':
-            return {
-                ...state,
-                todoItems: [
-                    { id: generateId(), done: false, ...action.data.todoItem },
-                    ...state.todoItems,
-                ],
-            };
+            return produce(state, (draft) => {
+                draft.todoItems.push({id: generateId(), done: false, ...action.data.todoItem})
+            });
         case 'delete':
-            return {
-                ...state,
-                todoItems: state.todoItems.filter(
+            return produce(state, (draft) => {
+                draft.todoItems = draft.todoItems.filter(
                     ({ id }) => id !== action.data.id,
-                ),
-            };
+                )
+            });
         case 'toggleDone':
             const itemIndex = state.todoItems.findIndex(
                 ({ id }) => id === action.data.id,
             );
             const item = state.todoItems[itemIndex];
 
-            return {
-                ...state,
-                todoItems: [
-                    ...state.todoItems.slice(0, itemIndex),
-                    { ...item, done: !item.done },
-                    ...state.todoItems.slice(itemIndex + 1),
-                ],
-            };
+            return produce(state, (draft) => {
+                draft.todoItems[itemIndex].done = !item.done;
+            });
         default:
             throw new Error();
     }
