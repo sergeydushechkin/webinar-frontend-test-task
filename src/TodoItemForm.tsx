@@ -19,7 +19,7 @@ export default function TodoItemForm() {
         <form
             onSubmit={handleSubmit((formData) => {
                 dispatch({ type: 'add', data: { todoItem: formData } });
-                reset({ title: '', details: '' });
+                reset({ title: '', details: '', dateTime: '' });
             })}
         >
             <Controller
@@ -46,6 +46,19 @@ export default function TodoItemForm() {
                         label="Details"
                         fullWidth={true}
                         multiline={true}
+                        className={classes.root}
+                    />
+                )}
+            />
+            <Controller
+                name="dateTime"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                    <TextField
+                        {...field}
+                        fullWidth={true}
+                        type="datetime-local"
                         className={classes.root}
                     />
                 )}

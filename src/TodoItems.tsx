@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
@@ -11,6 +11,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import classnames from 'classnames';
 import { motion } from 'framer-motion';
 import { TodoItem, useTodoItems } from './TodoItemsContext';
+import { notifyUser } from './TodoNotifications';
 
 const spring = {
     type: 'spring',
@@ -83,6 +84,21 @@ export const TodoItemCard = function ({ item }: { item: TodoItem }) {
         [item.id, dispatch],
     );
 
+    useEffect(() => {
+        const itemDateTime = Date.parse(item.dateTime);
+        let timer: NodeJS.Timeout;
+
+        if (!item.done && itemDateTime && itemDateTime > Date.now()) {
+            timer = setTimeout(() => {
+                notifyUser(item.title, item.details);
+            }, itemDateTime - Date.now());
+        }
+
+        return () => {
+            timer && clearTimeout(timer);
+        }
+    }, [item])
+
     return (
         <Card
             className={classnames(classes.root, {
@@ -96,17 +112,25 @@ export const TodoItemCard = function ({ item }: { item: TodoItem }) {
                     </IconButton>
                 }
                 title={
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={item.done}
-                                onChange={handleToggleDone}
-                                name={`checked-${item.id}`}
-                                color="primary"
-                            />
+                    <>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={item.done}
+                                    onChange={handleToggleDone}
+                                    name={`checked-${item.id}`}
+                                    color="primary"
+                                />
+                            }
+                            label={item.title}
+                        />
+                        {   
+                            item.dateTime &&
+                                <Typography variant="body2" component="p">
+                                    {item.dateTime}
+                                </Typography>
                         }
-                        label={item.title}
-                    />
+                    </>
                 }
             />
             {item.details ? (
